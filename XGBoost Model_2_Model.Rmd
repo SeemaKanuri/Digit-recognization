@@ -1,0 +1,97 @@
+---
+title: "XGBoost Model"
+author: "Seema Rani Kanuri"
+date: "December 8, 2016"
+output: html_document
+---
+#2nd Model
+## Introduction : Classify handwritten digits using the famous MNIST data
+
+Extreme Gradient Boosting (xgboost) is similar to gradient boosting framework but more efficient. It has both linear model solver and tree learning algorithms.(source :https://www.analyticsvidhya.com/blog/2016/01/xgboost-algorithm-easy-steps/)
+
+## Data Preprocessing
+
+The data for this competition were taken from the MNIST dataset. The MNIST ("Modified National Institute of Standards and Technology") dataset is a classic within the Machine Learning community that has been extensively studied.  (source:https://www.kaggle.com/c/digit-recognizer)
+
+```{r setup, warning=F, results='hide'}
+#install.packages("MASS")
+#install.packages("mgcv")
+#install.packages("rpart")
+#install.packages("Matrix")
+#install.packages("xgboost")
+#install.packages("caret")
+library("MASS")
+library("mgcv")
+library("rpart")
+library("xgboost")
+library("Matrix")
+library("caret")
+train<-read.csv("F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/train.csv")
+test<-read.csv("F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/test.csv")
+test <- sapply(test, as.numeric)
+
+```
+
+##Each variable is a list containing two things, label and data
+
+```{r}
+str(train)
+```
+
+# Initializing 
+
+## Making data compatible with xgboost using the `xgboost` package
+
+Initialize the xgboost machine on local box
+Load the csv as xgboost
+I just convert the `train` and `test` sets into the h2o format using the `xgboost` package
+
+```{r , results='hide'}
+DMatrix_train <- xgb.DMatrix(Matrix(data.matrix(
+  train[,colnames(train) != "label"])),
+  label = as.numeric(train$label))
+
+```
+
+#Basic Training using Xgboost
+
+## Train model using the `xgboost` package
+
+We will train the model using the following parameters:"multi:softmax" --set XGBoost to do multiclass classification using the softmax objective, also need to set num_class(number of classes)
+
+objective = "multi:softmax" ;
+eta : The default value is set to 0.3;
+nround = 10: there will be two passes on the data, the second one will enhance the model by further reducing the difference between ground truth and prediction.
+
+
+```{r}
+XGBoostModel <- xgboost(DMatrix_train, eta = 0.3, 
+               nround = 10, 
+               objective = "multi:softmax",
+               num_class = 10)
+```
+
+## Using the `xgboost` package converting into the `xgboost` format into data frame 
+
+## And saving the predicted values of test in Output file
+
+```{r ,  results='hide'}
+pred_XGBoostModel <- data.frame(ImageId=1:nrow(test), Label=predict(XGBoostModel, newdata = data.matrix(test)))
+write.csv(pred_XGBoostModel, "F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/XGBoostModel.csv")
+
+```
+
+
+## Conclusion
+This is my second model which is not an improvement of my accuacy score which I scored from the with H2O 2 hidden layer NN with accuracy score of 0.98129 . I got an accuracy score of 0.93757 from eXtreme Gradient Boosting using the `xgboost` package.
+
+
+## Resources used
+
+[XGBoost R Tutorial](http://xgboost.readthedocs.io/en/latest/R-package/xgboostPresentation.html)
+
+[XGBoost Parameters](https://github.com/dmlc/xgboost/blob/master/doc/parameter.md)
+
+[Learning Task Parameters](https://github.com/dmlc/xgboost/blob/master/doc/parameter.md)
+
+[eXtreme Gradient Boosting Training](https://rdrr.io/cran/xgboost/man/xgb.train.html)
