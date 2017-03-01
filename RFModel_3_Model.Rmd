@@ -1,0 +1,90 @@
+---
+title: "RF_Model_3_Model"
+author: "Seema Rani Kanuri"
+date: "December 10, 2016"
+output: html_document
+---
+
+
+#3rd Model
+## Introduction : Classify handwritten digits using the famous MNIST data
+
+
+## Data Preprocessing
+
+The data for this competition were taken from the MNIST dataset. The MNIST ("Modified National Institute of Standards and Technology") dataset is a classic within the Machine Learning community that has been extensively studied. (source:https://www.kaggle.com/c/digit-recognizer)
+
+
+```{r setup, warning=F, results='hide'} 
+#Loading important libraries
+library(caret)
+library(stats)
+library(randomForest)
+
+train<-read.csv("F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/train.csv")
+test<-read.csv("F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/test.csv")
+
+```
+
+
+## Looking at the variables of leaf_train and leaf_test
+
+The data files train.csv and test.csv contain gray-scale images of hand-drawn digits, each image is 28 pixels in height and 28 pixels in width, for a total of 784 pixels in total.The `train.csv` has label column and 784 columns with values, the rest of the columns contain the pixel-values of the associated image that go from 0 to 255. (source:https://www.kaggle.com/c/digit-recognizer)
+
+```{r }
+#str(train)
+#str(test)
+head(train[1:10])
+```
+
+
+# Initializing 
+# convert label from number to factor
+
+```{r}
+
+train$label <- as.factor(train$label)
+```
+
+#Basic Training using Random Forest
+
+## Train model using the `randomForest` package
+
+We will train the model using the following parameters:"multi:softmax" --set XGBoost to do multiclass classification using the softmax objective, also need to set num_class(number of classes)
+
+
+```{r}
+# run random forest classification
+model.rf <- randomForest(label~., data = train, tree = 50)
+
+print(model.rf$confusion)
+
+# predict
+test.pred <- predict(model.rf, test)
+submission <- data.frame(ImageId = 1:length(test.pred), Label = test.pred)
+
+```
+
+## And saving the predicted values of test in Output file
+
+```{r}
+
+write.csv(submission, file = "F:/OneDrive - Texas Tech University/MastersDocuments/DS- Multivariate Analysis/Digit Recognizer/submission.csv", row.names = FALSE)
+```
+
+##Conclusion
+
+This is my second model which is not an improvement of my accuacy score which I scored from the with H2O 2 hidden layer NN with accuracy score of 0.98129 . I got an accuracy score of 0.93757 from eXtreme Gradient Boosting using the xgboost package.
+
+```{r}
+
+```
+
+
+## Resources used
+
+[The essence of a handwritten digit](https://www.r-bloggers.com/the-essence-of-a-handwritten-digit/)
+
+[Machine Learning: The digit recognition problem.](http://deblivingdata.net/machine-learning-the-digit-recognition-problem/)
+
+[Using Random Forests for Handwritten DigitRecognition](https://hal.inria.fr/file/index/docid/436372/filename/icdar07.pdf)
