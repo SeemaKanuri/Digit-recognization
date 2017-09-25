@@ -118,7 +118,7 @@ However the best accuracy I got is with H2O 2 hidden layer NN with accuracy scor
 
 ```
 
-## Resources used in this :
+## Resources used
 
 [Deep Learning](http://spark.rstudio.com/h2o.html#deep_learning)
 
